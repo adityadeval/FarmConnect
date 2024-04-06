@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">FarmConnect</string>
+
+    <string name="content_description">image</string>
+    <string name="title_login">LOGIN</string>
+    <string name="et_hint_email">Email ID</string>
+    <string name="et_hint_password">Password</string>
+    <string name="lbl_forgot_password">Forgot Password?</string>
+    <string name="login_button_label">Login</string>
+    <string name="account_absent">Don\'t have an account?</string>
+    <string name="register"><u>Register</u></string>
+
+    <string name="create_an_account">CREATE AN ACCOUNT</string>
+    <string name="hint_last_name">Last name</string>
+    <string name="hint_first_name">First name</string>
+    <string name="et_hint_confirm_password">Confirm Password</string>
+    <string name="agreement_tandc">I Agree To The <u> Terms &amp; Conditions </u></string>
+    <string name="register_button_label">Register</string>
+    <string name="account_preexists">Already have an account?</string>
+    <string name="login"><u>Login</u></string>
+
+    <string name="err_msg_enter_first_name">Please enter your first name.</string>
+    <string name="err_msg_enter_last_name">Please enter your last name.</string>
+    <string name="err_msg_enter_email">Please enter your email address.</string>
+    <string name="err_msg_enter_password">Please enter the password.</string>
+    <string name="err_msg_enter_confirm_password">Please confirm your password.</string>
+    <string name="err_msg_password_and_confirm_password_mismatch">Password and confirm password do not match.</string>
+    <string name="err_msg_agree_terms_and_condition">Agreeing to the terms and conditions is required for user registration.</string>
+    <string name="registration_details_are_valid">"You have been registered successfully!"</string>
+
+</resources>

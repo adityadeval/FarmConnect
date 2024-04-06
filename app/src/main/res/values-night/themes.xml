@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <!--
+    <style name="Base.Theme.FarmConnect" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+    -->
+
+    <style name = "Theme.AppCompat.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TextInputLayoutOutlinedBoxTheme" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+    </style>
+
+</resources>

@@ -9,15 +9,36 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.Toolbar
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.FCTextViewBold
 
 class RegisterActivity : BaseActivity() {
+
+    private lateinit var et_first_name: CustomEditText
+    private lateinit var et_last_name: CustomEditText
+    private lateinit var et_email: CustomEditText
+    private lateinit var et_password: CustomEditText
+    private lateinit var et_confirm_password: CustomEditText
+    private lateinit var cb_tandc: AppCompatCheckBox
+    private lateinit var tv_login : FCTextViewBold
+    private lateinit var btn_register : FCButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        et_first_name = findViewById(R.id.et_first_name)
+        et_last_name = findViewById(R.id.et_last_name)
+        et_email = findViewById(R.id.et_email)
+        et_password = findViewById(R.id.et_password)
+        et_confirm_password = findViewById(R.id.et_confirm_password)
+        cb_tandc = findViewById(R.id.cb_tandc)
 
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
@@ -31,15 +52,15 @@ class RegisterActivity : BaseActivity() {
 
         setupActionBar()
 
-        val tv_login : FCTextViewBold = findViewById(R.id.tv_login)
+        tv_login = findViewById(R.id.tv_login)
         tv_login.setOnClickListener{
             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
             startActivity(intent)
         }
 
-        val btn_register : FCButton = findViewById(R.id.btn_register)
+        btn_register = findViewById(R.id.btn_register)
         btn_register.setOnClickListener{
-            validateRegisterDetails()
+            registerUser()
         }
     } //End of onCreate()
 
@@ -56,14 +77,8 @@ class RegisterActivity : BaseActivity() {
         toolbar_registerActivity.setNavigationOnClickListener { onBackPressed() }
     }
 
+    // Function to check if user has entered valid registration details.
     private fun validateRegisterDetails(): Boolean {
-
-        val et_first_name : CustomEditText = findViewById(R.id.et_first_name)
-        val et_last_name : CustomEditText = findViewById(R.id.et_last_name)
-        val et_email : CustomEditText = findViewById(R.id.et_email)
-        val et_password : CustomEditText = findViewById(R.id.et_password)
-        val et_confirm_password : CustomEditText = findViewById(R.id.et_confirm_password)
-        val cb_tandc : AppCompatCheckBox = findViewById(R.id.cb_tandc)
 
         return when {
             TextUtils.isEmpty(et_first_name.text.toString().trim { it <= ' ' }) -> {
@@ -101,9 +116,43 @@ class RegisterActivity : BaseActivity() {
                 false
             }
             else -> {
-                showCustomSnackBar(resources.getString(R.string.registration_details_are_valid), false)
                 true
             }
+        }
+    }
+
+    /**
+     * A function to register the user with email and password using FirebaseAuth.
+     */
+
+    private fun registerUser() {
+
+        // Before registration, first verify if all fields entered are correct using validateRegisterDetails().
+        if (validateRegisterDetails()) {
+
+            val email: String = et_email.text.toString().trim { it <= ' ' }
+            val password: String = et_email.text.toString().trim { it <= ' ' }
+
+            // Create an instance and create a register a user with email and password.
+            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(
+                    OnCompleteListener<AuthResult> { task ->
+
+                        // If the registration is successfully done
+                        if (task.isSuccessful) {
+
+                            // Firebase registered user
+                            val firebaseUser: FirebaseUser = task.result!!.user!!
+
+                            showCustomSnackBar(
+                                "You have been registered successfully with user id : ${firebaseUser.uid}",
+                                false
+                            )
+                        } else {
+                            // If the registering is not successful then show error message.
+                            showCustomSnackBar(task.exception!!.message.toString(), true)
+                        }
+                    })
         }
     }
 

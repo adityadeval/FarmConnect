@@ -39,6 +39,8 @@ class RegisterActivity : BaseActivity() {
         et_password = findViewById(R.id.et_password)
         et_confirm_password = findViewById(R.id.et_confirm_password)
         cb_tandc = findViewById(R.id.cb_tandc)
+        tv_login = findViewById(R.id.tv_login)
+        btn_register = findViewById(R.id.btn_register)
 
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
@@ -52,13 +54,19 @@ class RegisterActivity : BaseActivity() {
 
         setupActionBar()
 
-        tv_login = findViewById(R.id.tv_login)
         tv_login.setOnClickListener{
-            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
-            startActivity(intent)
+            //val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+            //startActivity(intent)
+
+            // Here, onBackPressed makes sure that the user doesn't end up stacking
+            // multiple login and register activities on top of each other.
+            // Assume, user did : Login --> Register --> Login
+            // Now, if he presses back he won't go to the Register screen.
+            // Instead the app will now close.
+            onBackPressed()
+
         }
 
-        btn_register = findViewById(R.id.btn_register)
         btn_register.setOnClickListener{
             registerUser()
         }
@@ -155,6 +163,13 @@ class RegisterActivity : BaseActivity() {
                                 "You have been registered successfully with user id : ${firebaseUser.uid}",
                                 false
                             )
+
+                            // Once user has been registered, sign him/her out and send them to the login page.
+                            FirebaseAuth.getInstance().signOut()
+                            // Call finish() to end register activity. As Login activity sends user to register activity, after
+                            // calling finish, user would be directed to Login activity again.
+                            finish()
+
                         } else {
                             // If the registering is not successful then show error message.
                             showCustomSnackBar(task.exception!!.message.toString(), true)

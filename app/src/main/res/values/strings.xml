@@ -28,4 +28,6 @@
     <string name="err_msg_agree_terms_and_condition">Agreeing to the terms and conditions is required for user registration.</string>
     <string name="registration_details_are_valid">"You have been registered successfully!"</string>
 
+    <string name="please_wait">Please Wait&#8987;</string>
+
 </resources>

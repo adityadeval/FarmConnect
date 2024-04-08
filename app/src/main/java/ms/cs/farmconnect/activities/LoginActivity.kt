@@ -5,11 +5,14 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import com.google.firebase.auth.FirebaseAuth
 import ms.cs.farmconnect.R
+import ms.cs.farmconnect.firestore.FirestoreClass
+import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.FCTextView
@@ -43,12 +46,27 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             )
         }
 
-        // Click event assigned to Forgot Password text.
+        // Click event assigned to Forgot Password text view.
         tv_forgot_password.setOnClickListener(this)
         // Click event assigned to Login button.
         button_login.setOnClickListener(this)
-        // Click event assigned to Register text.
+        // Click event assigned to the Register text view.
         tv_register.setOnClickListener(this)
+    }
+
+    fun userLoggedInSuccess(user: User) {
+
+        // Hide the progress dialog.
+        hideProgressDialog()
+
+        // Print the user details in the log as of now.
+        Log.i("First Name: ", user.firstName)
+        Log.i("Last Name: ", user.lastName)
+        Log.i("Email: ", user.email)
+
+        // Redirect the user to Main Screen after log in.
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finish()
     }
 
     // 'v' is the view that's being clicked on by the user.
@@ -109,11 +127,10 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener {task ->
 
-                    hideProgressDialog()
-
                     if (task.isSuccessful) {
-                        showCustomSnackBar("You have been logged in successfully!", false)
+                        FirestoreClass().getUserDetails(this@LoginActivity)
                     } else {
+                        hideProgressDialog()
                         showCustomSnackBar(task.exception!!.message.toString(), true)
                     }
                 }

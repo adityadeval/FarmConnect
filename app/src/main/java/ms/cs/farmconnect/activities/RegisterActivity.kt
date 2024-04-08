@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.Toolbar
 import com.google.android.gms.tasks.OnCompleteListener
@@ -14,6 +15,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import ms.cs.farmconnect.R
+import ms.cs.farmconnect.firestore.FirestoreClass
+import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.FCTextViewBold
@@ -151,7 +154,7 @@ class RegisterActivity : BaseActivity() {
                     OnCompleteListener<AuthResult> { task ->
 
                         // Hide the progress dialog
-                        hideProgressDialog()
+                        // hideProgressDialog()
 
                         // If the registration is successfully done
                         if (task.isSuccessful) {
@@ -159,23 +162,44 @@ class RegisterActivity : BaseActivity() {
                             // Firebase registered user
                             val firebaseUser: FirebaseUser = task.result!!.user!!
 
-                            showCustomSnackBar(
-                                "You have been registered successfully with user id : ${firebaseUser.uid}",
-                                false
-                            )
+                            val user = User(
+                                firebaseUser.uid,
+                                et_first_name.text.toString().trim { it <= ' ' },
+                                et_last_name.text.toString().trim { it <= ' ' },
+                                et_email.text.toString().trim { it <= ' ' }
+                                )
+
+                            FirestoreClass().registerUser(this@RegisterActivity, user)
 
                             // Once user has been registered, sign him/her out and send them to the login page.
-                            FirebaseAuth.getInstance().signOut()
+                            //FirebaseAuth.getInstance().signOut()
                             // Call finish() to end register activity. As Login activity sends user to register activity, after
                             // calling finish, user would be directed to Login activity again.
-                            finish()
+                            //finish()
 
                         } else {
+                            hideProgressDialog()
                             // If the registering is not successful then show error message.
                             showCustomSnackBar(task.exception!!.message.toString(), true)
                         }
                     })
         }
+    }
+
+    fun userRegistrationSuccess() {
+
+        // Hide the progress dialog
+        hideProgressDialog()
+
+        Toast.makeText(
+            this@RegisterActivity,
+            resources.getString(R.string.register_success),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        FirebaseAuth.getInstance().signOut()
+        // Finish the Register Screen
+        finish()
     }
 
 } //End of RegisterActivity class

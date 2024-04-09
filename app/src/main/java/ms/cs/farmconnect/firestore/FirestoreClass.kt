@@ -1,6 +1,8 @@
 package ms.cs.farmconnect.firestore
 
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -69,6 +71,28 @@ class FirestoreClass {
                 // Object of User class is created with it's variables storing values of corresponding variables in the Firestore doc.
                 // This newly generated object is referenced by 'user'
                 val user = document.toObject(User::class.java)!!
+
+                // getSharedPreferences(String name, int mode)
+                // First parameter is the name of the preferences file that'll be created if it doesn't exist.
+                // Second is the operating mode of the preferences file.
+                // Current mode value ensures that the file can only be accessed by the calling application.
+                val sharedPreferences =
+                    activity.getSharedPreferences(
+                        Constants.FARMCONNECT_PREFERENCES,
+                        Context.MODE_PRIVATE
+                    )
+
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                // The first parameter to putString is the key. Here it is "logged_in_username"
+                // The second parameter to putString is the value. Here, it's the first name and last name, fetched from the firestore's document, which
+                // is then converted into an object of type User class defined by us.
+                editor.putString(
+                    Constants.LOGGED_IN_USERNAME,
+                    "${user.firstName} ${user.lastName}"
+                )
+                editor.apply()
+                // So at the end the Shared Preferences file named "FarmConnectPrefs" would contain :
+                // Key:Value -----> logged_in_username : Ganesh G. (If a user named Ganesh G. has logged in)
 
                 when (activity) {
                     is LoginActivity -> {

@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.User
+import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.FCTextView
@@ -68,6 +69,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         if (user.profileCompleted == 0) {
             // If the user profile is incomplete then launch the UserProfileActivity.
             val intent = Intent(this@LoginActivity, UserProfileActivity::class.java)
+            intent.putExtra(Constants.EXTRA_USER_DETAILS, user)
             startActivity(intent)
         } else {
             // Redirect the user to Main Screen after log in.

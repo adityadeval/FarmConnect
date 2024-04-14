@@ -1,5 +1,9 @@
 package ms.cs.farmconnect.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
  data class User(
         val id: String = "",
         val firstName: String = "",
@@ -8,4 +12,4 @@ package ms.cs.farmconnect.models
         val image: String = "",
         val mobile: Long = 0,
         val gender: String = "",
-        val profileCompleted: Int = 0)
+        val profileCompleted: Int = 0): Parcelable

@@ -4,6 +4,7 @@ plugins {
     //Newly added line
     id("com.google.gms.google-services")
     //End of Newly added line
+    id("kotlin-parcelize")
 }
 
 android {

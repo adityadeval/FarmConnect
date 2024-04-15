@@ -18,6 +18,7 @@ import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
+import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
 
 class UserProfileActivity : BaseActivity(), View.OnClickListener {
@@ -132,7 +133,11 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                         // The uri of selected image from phone storage.
                         val selectedImageFileUri = data.data!!
 
-                        iv_user_photo.setImageURI(selectedImageFileUri)
+                        //iv_user_photo.setImageURI(selectedImageFileUri)
+                        GlideLoader(this@UserProfileActivity).loadUserPicture(
+                            selectedImageFileUri,
+                            iv_user_photo
+                        )
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(

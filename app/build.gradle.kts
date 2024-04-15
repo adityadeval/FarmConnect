@@ -5,6 +5,9 @@ plugins {
     id("com.google.gms.google-services")
     //End of Newly added line
     id("kotlin-parcelize")
+
+    // ("43.") Suggested by GPT. Required for using kapt in the dependencies section for using glide.
+    id("kotlin-kapt")
 }
 
 android {
@@ -40,6 +43,7 @@ android {
 }
 
 dependencies {
+
     //Newly added line
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics")
@@ -66,4 +70,9 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
+
+    // ("43.") Below line is required for using Glide to load profile images
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    // ("43.") Suggested by GPT. Used instead of  annotationProcessor.
+    kapt ("com.github.bumptech.glide:compiler:4.16.0")
 }

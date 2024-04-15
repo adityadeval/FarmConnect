@@ -14,6 +14,11 @@ object Constants {
 
     const val PICK_IMAGE_REQUEST_CODE = 1
 
+    const val MALE: String = "male"
+    const val FEMALE: String = "female"
+
+    const val MOBILE: String = "mobile"
+    const val GENDER: String = "gender"
 
     // Below function would be used by multiple activities. For eg. The UserProfileActivity where the user needs to select a
     // profile image from the gallery. Also the Add Products activity where the user would need to select a product image from the gallery.

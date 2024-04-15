@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import ms.cs.farmconnect.activities.LoginActivity
 import ms.cs.farmconnect.activities.RegisterActivity
+import ms.cs.farmconnect.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 
@@ -25,6 +26,10 @@ class FirestoreClass {
             // Pass the doc id, which in this case is the id field present in User class
             .document(userInfo.id)
             // Here userInfo contains multiple fields containing user's data.
+            // The SetOptions.merge() is going to be helpful for the updateUserProfileData(), where
+            // we would be passing key value pairs for the mobile number and gender in the form of a hashmap.
+            // So we won't be completely erasing everything in the doc, and replacing it with the new key value pairs.
+            // Instead, we'll just update the values of keys mobile and gender, and keep rest of the values intact.
             .set(userInfo, SetOptions.merge())
             .addOnSuccessListener {
 
@@ -113,6 +118,40 @@ class FirestoreClass {
                 Log.e(
                     activity.javaClass.simpleName,
                     "Error while getting user details.",
+                    e
+                )
+            }
+    }
+
+    fun updateUserProfileData(activity: Activity, userHashMap: HashMap<String, Any>) {
+        // Access the collection named 'Users' from our Firestore.
+        mFireStore.collection(Constants.USERS)
+            // The currentUser's ID would also be the ID of the document present inside the Users collection in Firestore.
+            .document(getCurrentUserID())
+            // A HashMap of fields which are to be updated.
+            // Example of what userHashMap would contain :
+            // mobile : 7627481234, gender : male
+            .update(userHashMap)
+            .addOnSuccessListener {
+                when (activity) {
+                    is UserProfileActivity -> {
+                        // Call a function of base activity for transferring the result to it.
+                        activity.userProfileUpdateSuccess()
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+
+                when (activity) {
+                    is UserProfileActivity -> {
+                        // Hide the progress dialog if there is any error. And print the error in log.
+                        activity.hideProgressDialog()
+                    }
+                }
+
+                Log.e(
+                    activity.javaClass.simpleName,
+                    "Error while updating the user details.",
                     e
                 )
             }

@@ -107,6 +107,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    // Below function checks if the user Id and password fields on the Login Screen are not left empty.
     private fun validateLoginDetails(): Boolean {
         return when {
             TextUtils.isEmpty(et_email.text.toString().trim { it <= ' ' }) -> {

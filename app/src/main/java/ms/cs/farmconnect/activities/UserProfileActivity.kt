@@ -16,9 +16,11 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import ms.cs.farmconnect.R
+import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
+import ms.cs.farmconnect.utils.CustomRadioButton
 import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
@@ -31,6 +33,10 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     private lateinit var et_mobile_number : CustomEditText
     private lateinit var iv_user_photo : ImageView
     private lateinit var btn_submit : FCButton
+    private lateinit var rb_male : CustomRadioButton
+
+    // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
+    private lateinit var mUserDetails: User
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -41,9 +47,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         et_mobile_number = findViewById(R.id.et_mobile_number)
         iv_user_photo = findViewById(R.id.iv_user_photo)
         btn_submit = findViewById(R.id.btn_submit)
+        rb_male = findViewById(R.id.rb_male)
 
-        // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
-        var userDetails: User = User()
         if(intent.hasExtra(Constants.EXTRA_USER_DETAILS)) {
 
             // getParcelableExtra() with just one String parameter is deprecated.
@@ -52,10 +57,10 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             // So below if condition first checks the version of the device. If it's API 33 or up, it uses the new method,
             // else it uses the deprecated method.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                userDetails = intent.getParcelableExtra(Constants.EXTRA_USER_DETAILS, User::class.java)!!
+                mUserDetails = intent.getParcelableExtra(Constants.EXTRA_USER_DETAILS, User::class.java)!!
             } else {
                 // Use the deprecated method or handle differently for older devices
-                userDetails = intent.getParcelableExtra<User>(Constants.EXTRA_USER_DETAILS)!!
+                mUserDetails = intent.getParcelableExtra<User>(Constants.EXTRA_USER_DETAILS)!!
             }
             // Get the user details from intent as a ParcelableExtra.
             //userDetails = intent.getParcelableExtra(Constants.EXTRA_USER_DETAILS, User::class.java) ?: User()
@@ -63,13 +68,13 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
         // Setting isEnabled to false will now freeze that EditText and the user would no longer be able to edit it.
         et_first_name.isEnabled = false
-        et_first_name.setText(userDetails.firstName)
+        et_first_name.setText(mUserDetails.firstName)
 
         et_last_name.isEnabled = false
-        et_last_name.setText(userDetails.lastName)
+        et_last_name.setText(mUserDetails.lastName)
 
         et_email.isEnabled = false
-        et_email.setText(userDetails.email)
+        et_email.setText(mUserDetails.email)
 
         iv_user_photo.setOnClickListener(this@UserProfileActivity)
         btn_submit.setOnClickListener(this@UserProfileActivity)
@@ -106,11 +111,50 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                 R.id.btn_submit ->{
 
                     if(validateUserProfileDetails()){
-                        showCustomSnackBar("Your details are valid. You can update them.",false)
+
+                        // In the below HashMap we'll store all the information that the user can enter on the UserProfile Activity.
+                        // So, in this activity we only need to get mobile number and gender. Rest of the fields in this Activity are non-editable.
+                        val userHashMap = HashMap<String, Any>()
+
+                        val mobileNumber = et_mobile_number.text.toString().trim { it <= ' ' }
+
+                        val gender = if (rb_male.isChecked) {
+                            Constants.MALE
+                        } else {
+                            Constants.FEMALE
+                        }
+
+                        if (mobileNumber.isNotEmpty()) {
+                            userHashMap[Constants.MOBILE] = mobileNumber.toLong()
+                        }
+
+                        userHashMap[Constants.GENDER] = gender
+
+                        showProgressDialog(resources.getString(R.string.please_wait))
+
+                        FirestoreClass().updateUserProfileData(
+                            this@UserProfileActivity,
+                            userHashMap
+                        )
                     }
                 }
             }
         }
+    }
+
+    fun userProfileUpdateSuccess() {
+        // Hide the progress dialog
+        hideProgressDialog()
+
+        Toast.makeText(
+            this@UserProfileActivity,
+            resources.getString(R.string.msg_profile_update_success),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        // Redirect to the Main Screen after profile completion.
+        startActivity(Intent(this@UserProfileActivity, MainActivity::class.java))
+        finish()
     }
 
     override fun onRequestPermissionsResult(
@@ -185,5 +229,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             }
         }
     }
+
+
+
 
 }

@@ -62,10 +62,10 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_user_placeholder" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/user_image_background" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:background="@drawable/user_image_background" />-->
             </FrameLayout>
 
             <com.google.android.material.textfield.TextInputLayout

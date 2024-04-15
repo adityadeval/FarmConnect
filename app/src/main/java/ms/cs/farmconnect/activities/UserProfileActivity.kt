@@ -1,10 +1,14 @@
 package ms.cs.farmconnect.activities
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -14,6 +18,7 @@ import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
+import java.io.IOException
 
 class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
@@ -76,7 +81,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                         )
                         == PackageManager.PERMISSION_GRANTED
                     ) {
-                        showCustomSnackBar("You already have the storage permission.", false)
+                        //showCustomSnackBar("You already have the storage permission.", false)
+                        Constants.showImageChooser(this@UserProfileActivity)
                     } else {
 
                         /*Below function requests storage permission from the user */
@@ -104,7 +110,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             // so essentially grantResults array won't be empty AND the array's first position would store an integer equivalent to the
             // permission granted state's integer.
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showCustomSnackBar("The storage permission is granted.", false)
+                //showCustomSnackBar("The storage permission is granted.", false)
+                Constants.showImageChooser(this@UserProfileActivity)
             } else {
                 //Displaying another toast if permission is not granted
                 Toast.makeText(
@@ -113,6 +120,32 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                     Toast.LENGTH_LONG
                 ).show()
             }
+        }
+    }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == Constants.PICK_IMAGE_REQUEST_CODE) {
+                if (data != null) {
+                    try {
+                        // The uri of selected image from phone storage.
+                        val selectedImageFileUri = data.data!!
+
+                        iv_user_photo.setImageURI(selectedImageFileUri)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        Toast.makeText(
+                            this@UserProfileActivity,
+                            resources.getString(R.string.image_selection_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+            // A log is printed when user close or cancel the image selection.
+            Log.e("Request Cancelled", "Image selection cancelled")
         }
     }
 }

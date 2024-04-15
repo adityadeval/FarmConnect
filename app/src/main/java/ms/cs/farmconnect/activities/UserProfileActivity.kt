@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -18,6 +19,7 @@ import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
+import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
 
@@ -26,7 +28,9 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     private lateinit var et_first_name : CustomEditText
     private lateinit var et_last_name : CustomEditText
     private lateinit var et_email : CustomEditText
+    private lateinit var et_mobile_number : CustomEditText
     private lateinit var iv_user_photo : ImageView
+    private lateinit var btn_submit : FCButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -34,7 +38,9 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         et_first_name = findViewById(R.id.et_first_name)
         et_last_name = findViewById(R.id.et_last_name)
         et_email = findViewById(R.id.et_email)
+        et_mobile_number = findViewById(R.id.et_mobile_number)
         iv_user_photo = findViewById(R.id.iv_user_photo)
+        btn_submit = findViewById(R.id.btn_submit)
 
         // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
         var userDetails: User = User()
@@ -66,6 +72,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         et_email.setText(userDetails.email)
 
         iv_user_photo.setOnClickListener(this@UserProfileActivity)
+        btn_submit.setOnClickListener(this@UserProfileActivity)
     }
 
     override fun onClick(v: View?) {
@@ -93,6 +100,13 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                             Constants.READ_STORAGE_PERMISSION_CODE
                         )
+                    }
+                }
+
+                R.id.btn_submit ->{
+
+                    if(validateUserProfileDetails()){
+                        showCustomSnackBar("Your details are valid. You can update them.",false)
                     }
                 }
             }
@@ -153,4 +167,23 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             Log.e("Request Cancelled", "Image selection cancelled")
         }
     }
+
+    // Below function checks if details entered by user on the UserProfile page are valid.
+    // It's called when user clicls on the submit button of the UserProfileActivity.
+    // Here we only check if the mobile number field has been left empty or not.
+    // The reason for checking only this is that the first name, last name and email are non-editable,
+    // the gender radio buttons are set to select male by default and the user image is not mandatory.
+    private fun validateUserProfileDetails(): Boolean {
+        return when {
+            // Check if mobile number is empty. If it is, inform user that mobile number is mandatory using a SnackBar.
+            TextUtils.isEmpty(et_mobile_number.text.toString().trim { it <= ' ' }) -> {
+                showCustomSnackBar(resources.getString(R.string.err_msg_enter_mobile_number), true)
+                false
+            }
+            else -> {
+                true
+            }
+        }
+    }
+
 }

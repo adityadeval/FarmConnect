@@ -1,18 +1,26 @@
 package ms.cs.farmconnect.activities
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 
-class UserProfileActivity : AppCompatActivity() {
+class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
     private lateinit var et_first_name : CustomEditText
     private lateinit var et_last_name : CustomEditText
     private lateinit var et_email : CustomEditText
+    private lateinit var iv_user_photo : ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -20,6 +28,7 @@ class UserProfileActivity : AppCompatActivity() {
         et_first_name = findViewById(R.id.et_first_name)
         et_last_name = findViewById(R.id.et_last_name)
         et_email = findViewById(R.id.et_email)
+        iv_user_photo = findViewById(R.id.iv_user_photo)
 
         // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
         var userDetails: User = User()
@@ -49,5 +58,61 @@ class UserProfileActivity : AppCompatActivity() {
 
         et_email.isEnabled = false
         et_email.setText(userDetails.email)
+
+        iv_user_photo.setOnClickListener(this@UserProfileActivity)
+    }
+
+    override fun onClick(v: View?) {
+        if (v != null) {
+            when (v.id) {
+
+                R.id.iv_user_photo -> {
+
+                    // Here we will check if the READ_EXTERNAL_STORAGE permission is already granted for our app.
+                    // If not, then execution of else happens where we request for the permission.
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                        == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        showCustomSnackBar("You already have the storage permission.", false)
+                    } else {
+
+                        /*Below function requests storage permission from the user */
+
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                            Constants.READ_STORAGE_PERMISSION_CODE
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == Constants.READ_STORAGE_PERMISSION_CODE) {
+            // Below if would be true, when on the Grant permission dialog, the user clicked on one of the options,
+            // which would be stored in grantResults[0] (0th position as the permissions array also has the Storage permission in the 0th position),
+            // so essentially grantResults array won't be empty AND the array's first position would store an integer equivalent to the
+            // permission granted state's integer.
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showCustomSnackBar("The storage permission is granted.", false)
+            } else {
+                //Displaying another toast if permission is not granted
+                Toast.makeText(
+                    this,
+                    resources.getString(R.string.read_storage_permission_denied),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 }

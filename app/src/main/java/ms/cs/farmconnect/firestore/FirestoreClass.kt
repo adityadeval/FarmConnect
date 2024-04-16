@@ -181,7 +181,7 @@ class FirestoreClass {
         sRef.putFile(imageFileURI!!)
             // In case file was uploaded successfully to the sRef location, a taskSnapshot is returned by the SuccessListener.
             .addOnSuccessListener { taskSnapshot ->
-                // The image upload is success
+                // Image has been uploaded successfully
                 Log.e(
                     "Firebase Image URL",
                     taskSnapshot.metadata!!.reference!!.downloadUrl.toString()
@@ -199,7 +199,8 @@ class FirestoreClass {
                         when (activity) {
                             is UserProfileActivity -> {
                                 // In case current function is being used by UserProfileActivity, call its function imageUploadSuccess and
-                                // pass the uri returned by Firebase in the form of String as a parameter to it.
+                                // pass the url returned by Firebase in the form of String as a parameter to it.
+                                // This function will then store the url locally in a variable called mUserProfileImageURL inside its class.
                                 activity.imageUploadSuccess(uri.toString())
                             }
                         }

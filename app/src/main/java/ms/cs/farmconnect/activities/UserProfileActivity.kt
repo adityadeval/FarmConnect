@@ -39,6 +39,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     private lateinit var mUserDetails: User
 
     private var mSelectedImageFileUri: Uri? = null
+
+    private var mUserProfileImageURL: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -112,48 +114,73 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
                 R.id.btn_submit ->{
 
-                    showProgressDialog(resources.getString(R.string.please_wait))
-
-                    FirestoreClass().uploadImageToCloudStorage(
-                        this@UserProfileActivity,
-                        mSelectedImageFileUri
-                    )
-
-                    /*
                     if(validateUserProfileDetails()){
-
-                        // In the below HashMap we'll store all the information that the user can enter on the UserProfile Activity.
-                        // So, in this activity we only need to get mobile number and gender. Rest of the fields in this Activity are non-editable.
-                        val userHashMap = HashMap<String, Any>()
-
-                        val mobileNumber = et_mobile_number.text.toString().trim { it <= ' ' }
-
-                        val gender = if (rb_male.isChecked) {
-                            Constants.MALE
-                        } else {
-                            Constants.FEMALE
-                        }
-
-                        if (mobileNumber.isNotEmpty()) {
-                            userHashMap[Constants.MOBILE] = mobileNumber.toLong()
-                        }
-
-                        userHashMap[Constants.GENDER] = gender
 
                         showProgressDialog(resources.getString(R.string.please_wait))
 
-                        FirestoreClass().updateUserProfileData(
-                            this@UserProfileActivity,
-                            userHashMap
-                        )
-                    }
+                        // The mSelectedImageFileUri is going to contain the uri of the locally stored image.
+                        // It is initialized by the onActivityResult() function which gets executed by Android right after :
+                        // User clicks on iv_user_photo --> Constants.showImageChooser() is called --> startActivityForResult() is called in the context of UserProfileActivity
+                        if (mSelectedImageFileUri != null) {
+                            // The below function will :
+                            // 1) Upload the image onto the cloud storage and
+                            // 2) Call imageUploadSuccess() which will :
+                            //    a) Initialize mUserProfileImageURL with the download link for our image from the Cloud storage.
+                            //    b) Call updateUserProfileDetails() which will fetch user's mobile number and gender from the layout, the url for the user's profile image
+                            //       on Cloud storage and update the user's existing document on Firestore with these newly added details.
 
-                     */
+                            FirestoreClass().uploadImageToCloudStorage(
+                                this@UserProfileActivity,
+                                mSelectedImageFileUri
+                            )
+                        }else{
+                            updateUserProfileDetails()
+                        }
+                    }
                 }
-            }
+
+            } // end of  when (v.id)
+        } // end of  if (v != null)
+    } // end of onClick()
+
+
+    // Below function will :
+    // 1) Fetch the Mobile number, gender and url for user's profile image (ONLY IF user uploaded image in current session)
+    //    and update all these details inside the current user's firestore document.
+    // 2) It'll also call userProfileUpdateSuccess() which in turn hides the progress dialog and sends user to the MainActivity.
+    private fun updateUserProfileDetails() {
+        // In the below HashMap we'll store all the information that the user can enter on the UserProfile Activity.
+        // So, in this activity we only need to get mobile number and gender. Rest of the fields in this Activity are non-editable.
+        val userHashMap = HashMap<String, Any>()
+
+        val mobileNumber = et_mobile_number.text.toString().trim { it <= ' ' }
+
+        val gender = if (rb_male.isChecked) {
+            Constants.MALE
+        } else {
+            Constants.FEMALE
         }
+
+        if (mUserProfileImageURL.isNotEmpty()) {
+            userHashMap[Constants.IMAGE] = mUserProfileImageURL
+        }
+
+        if (mobileNumber.isNotEmpty()) {
+            userHashMap[Constants.MOBILE] = mobileNumber.toLong()
+        }
+
+        userHashMap[Constants.GENDER] = gender
+
+        //showProgressDialog(resources.getString(R.string.please_wait))
+
+        FirestoreClass().updateUserProfileData(
+            this@UserProfileActivity,
+            userHashMap
+        )
     }
 
+
+    // Below function is responsible for mainly moving the user to the MainActivity.
     fun userProfileUpdateSuccess() {
         // Hide the progress dialog
         hideProgressDialog()
@@ -255,15 +282,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     }
 
     fun imageUploadSuccess(imageURL: String) {
-
-        // Hide the progress dialog
-        hideProgressDialog()
-
-        Toast.makeText(
-            this@UserProfileActivity,
-            "Your image is uploaded successfully. Image URL is $imageURL",
-            Toast.LENGTH_SHORT
-        ).show()
+        mUserProfileImageURL = imageURL
+        updateUserProfileDetails()
     }
 
 }

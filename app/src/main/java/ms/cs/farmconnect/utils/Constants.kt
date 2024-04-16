@@ -22,6 +22,8 @@ object Constants {
     const val MOBILE: String = "mobile"
     const val GENDER: String = "gender"
 
+    const val IMAGE: String = "image"
+
     const val USER_PROFILE_IMAGE:String = "User_Profile_Image"
 
     // Below function would be used by multiple activities. For eg. The UserProfileActivity where the user needs to select a

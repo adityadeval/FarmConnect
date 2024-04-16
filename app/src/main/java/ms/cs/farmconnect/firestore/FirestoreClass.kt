@@ -3,10 +3,13 @@ package ms.cs.farmconnect.firestore
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import ms.cs.farmconnect.activities.LoginActivity
 import ms.cs.farmconnect.activities.RegisterActivity
 import ms.cs.farmconnect.activities.UserProfileActivity
@@ -153,6 +156,70 @@ class FirestoreClass {
                     activity.javaClass.simpleName,
                     "Error while updating the user details.",
                     e
+                )
+            }
+    }
+
+    fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?) {
+
+
+        // The FirebaseStorage.getInstance().reference gets you a Storage reference to the root path of your Firebase Storage bucket.
+        // For eg. The root path would be something like gs://your-app-id.appspot.com/
+        // When you call .child(pathString) on a StorageReference, it appends the pathString to the current reference's path,
+        // effectively giving you a reference to that location.
+        val sRef: StorageReference = FirebaseStorage.getInstance().reference.child(
+            // We create a name of the image file, that we upload into the Firebase storage.
+            // For eg. User_Profile_Image1713243701.jpg
+            Constants.USER_PROFILE_IMAGE + System.currentTimeMillis() + "."
+                    + Constants.getFileExtension(
+                activity,
+                imageFileURI
+            )
+        )
+
+        //Add the file present locally at imageFileURI to location sRef on the Firebase Cloud storage of our Firebase project.
+        sRef.putFile(imageFileURI!!)
+            // In case file was uploaded successfully to the sRef location, a taskSnapshot is returned by the SuccessListener.
+            .addOnSuccessListener { taskSnapshot ->
+                // The image upload is success
+                Log.e(
+                    "Firebase Image URL",
+                    taskSnapshot.metadata!!.reference!!.downloadUrl.toString()
+                )
+
+                // taskSnapshot.metadata!!.reference!!.downloadUrl helps to retrieve the URL of the successfully uploaded file.
+                // metadata can include things like size, content type, and more importantly for this case, a reference to the file in storage.
+                // reference is a property of metadata. It points directly to where the file is stored in Firebase Storage.
+                taskSnapshot.metadata!!.reference!!.downloadUrl
+                    // uri would be a link to the image stored on the Firebase Cloud storage. Image can be downloaded using this link.
+                    .addOnSuccessListener { uri ->
+                        Log.e("Downloadable Image URL", uri.toString())
+
+                        // Check which activity is using current function.
+                        when (activity) {
+                            is UserProfileActivity -> {
+                                // In case current function is being used by UserProfileActivity, call its function imageUploadSuccess and
+                                // pass the uri returned by Firebase in the form of String as a parameter to it.
+                                activity.imageUploadSuccess(uri.toString())
+                            }
+                        }
+                    }
+            }
+
+            // Image file couldn't be uploaded to the sRef location.
+            .addOnFailureListener { exception ->
+
+                // Hide the progress dialog if there is any error. And print the error in log.
+                when (activity) {
+                    is UserProfileActivity -> {
+                        activity.hideProgressDialog()
+                    }
+                }
+
+                Log.e(
+                    activity.javaClass.simpleName,
+                    exception.message,
+                    exception
                 )
             }
     }

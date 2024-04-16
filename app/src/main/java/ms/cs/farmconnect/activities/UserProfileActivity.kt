@@ -37,6 +37,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
     // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
     private lateinit var mUserDetails: User
+
+    private var mSelectedImageFileUri: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
@@ -110,6 +112,14 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
 
                 R.id.btn_submit ->{
 
+                    showProgressDialog(resources.getString(R.string.please_wait))
+
+                    FirestoreClass().uploadImageToCloudStorage(
+                        this@UserProfileActivity,
+                        mSelectedImageFileUri
+                    )
+
+                    /*
                     if(validateUserProfileDetails()){
 
                         // In the below HashMap we'll store all the information that the user can enter on the UserProfile Activity.
@@ -137,6 +147,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                             userHashMap
                         )
                     }
+
+                     */
                 }
             }
         }
@@ -182,6 +194,18 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+
+    // Below is the flow explaining how this function will get called.
+    // User clicks on the imageView --> OnClick method is called, since the imageView has an OnClick Listener.
+    // --> The listener checks if the app has the storage permission. If yes, it calls the showImageChooser() method inside Constants.
+    // --> This method then builds up an intent with the action = Pick and location = the device's gallery (in simple words)
+    // startActivityForResult is called in the Context of the UserProfileActivity with the intent we built above, and access code as PICK_IMAGE_REQUEST_CODE.
+    // After the user selects an image from a pop-up dialog for uploading an image, the below function is called.
+    // startActivityForResult() was called in the context of UserProfileActivity. Hence the onActivityResult() is also implemented in the same activity.
+    // Keeping it simple : Below function is called, immediately after user selects an image from the gallery in the dialog shown to him/her.
+    // What the function achieves :
+    // 1) Stores the uri of the image selected by user into mSelectedImageFileUri which will also be used by uploadImageToCloudStorage() of the FirestoreClass.
+    // 2) Displays this image in ImageView using glide.
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -189,11 +213,11 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                 if (data != null) {
                     try {
                         // The uri of selected image from phone storage.
-                        val selectedImageFileUri = data.data!!
+                        mSelectedImageFileUri = data.data!!
 
                         //iv_user_photo.setImageURI(selectedImageFileUri)
                         GlideLoader(this@UserProfileActivity).loadUserPicture(
-                            selectedImageFileUri,
+                            mSelectedImageFileUri!!,
                             iv_user_photo
                         )
                     } catch (e: IOException) {
@@ -230,7 +254,16 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    fun imageUploadSuccess(imageURL: String) {
 
+        // Hide the progress dialog
+        hideProgressDialog()
 
+        Toast.makeText(
+            this@UserProfileActivity,
+            "Your image is uploaded successfully. Image URL is $imageURL",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 
 }

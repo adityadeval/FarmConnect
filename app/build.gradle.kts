@@ -71,6 +71,10 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
 
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage")
+
     // ("43.") Below line is required for using Glide to load profile images
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     // ("43.") Suggested by GPT. Used instead of  annotationProcessor.

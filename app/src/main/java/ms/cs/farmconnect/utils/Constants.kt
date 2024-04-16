@@ -26,6 +26,8 @@ object Constants {
 
     const val USER_PROFILE_IMAGE:String = "User_Profile_Image"
 
+    const val COMPLETE_PROFILE: String = "profileCompleted"
+
     // Below function would be used by multiple activities. For eg. The UserProfileActivity where the user needs to select a
     // profile image from the gallery. Also the Add Products activity where the user would need to select a product image from the gallery.
     // Adding this function in Constants allows us to easily reuse it in multiple activities.

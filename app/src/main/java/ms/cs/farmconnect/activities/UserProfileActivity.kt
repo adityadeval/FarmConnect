@@ -172,6 +172,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         userHashMap[Constants.GENDER] = gender
 
         //showProgressDialog(resources.getString(R.string.please_wait))
+        userHashMap[Constants.COMPLETE_PROFILE] = 1
 
         FirestoreClass().updateUserProfileData(
             this@UserProfileActivity,

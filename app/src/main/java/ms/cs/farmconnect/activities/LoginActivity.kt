@@ -66,8 +66,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             intent.putExtra(Constants.EXTRA_USER_DETAILS, user)
             startActivity(intent)
         } else {
-            // Redirect the user to Main Screen after log in.
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            // Redirect the user to DashBoard activity after log in, if the UserProfile is completed.
+            startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
         }
         finish()
     }

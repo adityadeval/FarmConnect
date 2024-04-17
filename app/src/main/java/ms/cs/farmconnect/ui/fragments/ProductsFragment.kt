@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 //import androidx.lifecycle.ViewModelProvider
-import ms.cs.farmconnect.databinding.FragmentHomeBinding
+import ms.cs.farmconnect.databinding.FragmentProductsBinding
 
-class HomeFragment : Fragment() {
+class ProductsFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentProductsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -25,11 +25,11 @@ class HomeFragment : Fragment() {
         //val homeViewModel =
         //    ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentProductsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 //
         val textView: TextView = binding.textHome
-        textView.text = "This is home Fragment"
+        textView.text = "This is Products fragment"
 
 //        homeViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it

@@ -1,0 +1,30 @@
+<!--<vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:width="50dp"-->
+<!--    android:height="63.675213dp"-->
+<!--    android:viewportWidth="93.6"-->
+<!--    android:viewportHeight="119.2">-->
+<!--    <path-->
+<!--        android:fillColor="#FF000000"-->
+<!--        android:pathData="M68,1.2h-67V118h91.7V25.9L68,1.2zM82.7,25.9H68V11.1L82.7,25.9zM85.6,111H7.9V8.2h53v24.7h24.7V111z" />-->
+<!--    <path-->
+<!--        android:fillColor="#FF000000"-->
+<!--        android:pathData="M20.4,44.5V71l26.4,12.3L73.2,71V44.5L46.8,31.6L20.4,44.5zM61.6,46.6l-14.8,7l-14.8,-7l14.8,-7.2L61.6,46.6zM27.4,52.2l15.8,7.5v14.2l-15.8,-7.4V52.2zM50.3,73.9V59.7l15.8,-7.5v14.4L50.3,73.9z" />-->
+<!--    <path-->
+<!--        android:fillColor="#FF000000"-->
+<!--        android:pathData="M16.9,88.1h59.7v7h-59.7z" />-->
+<!--    <path-->
+<!--        android:fillColor="#FF000000"-->
+<!--        android:pathData="M16.9,99.3h44.8v7h-44.8z" />-->
+<!--</vector>-->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:tint="?attr/colorControlNormal">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M164,800L164,283L82,107L138,80L228,283L733,283L823,80L879,107L797,283L797,800L164,800ZM396,503L566,503Q578.75,503 587.38,494.33Q596,485.65 596,472.83Q596,460 587.38,451.5Q578.75,443 566,443L396,443Q383.25,443 374.63,451.67Q366,460.35 366,473.17Q366,486 374.63,494.5Q383.25,503 396,503ZM224,740L737,740L737,343L224,343L224,740ZM224,740L224,343L224,343L224,740L224,740Z"/>
+</vector>
+

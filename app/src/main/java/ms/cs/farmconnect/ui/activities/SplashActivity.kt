@@ -1,4 +1,4 @@
-package ms.cs.farmconnect.activities
+package ms.cs.farmconnect.ui.activities
 
 import android.content.Intent
 import android.os.Build

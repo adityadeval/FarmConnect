@@ -10,9 +10,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import ms.cs.farmconnect.activities.LoginActivity
-import ms.cs.farmconnect.activities.RegisterActivity
-import ms.cs.farmconnect.activities.UserProfileActivity
+import ms.cs.farmconnect.ui.activities.LoginActivity
+import ms.cs.farmconnect.ui.activities.RegisterActivity
+import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.utils.Constants
 

@@ -1,6 +1,5 @@
-package ms.cs.farmconnect.activities
+package ms.cs.farmconnect.ui.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar

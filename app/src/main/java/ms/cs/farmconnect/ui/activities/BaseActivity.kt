@@ -1,8 +1,10 @@
-package ms.cs.farmconnect.activities
+package ms.cs.farmconnect.ui.activities
 
 import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import ms.cs.farmconnect.R
@@ -15,6 +17,8 @@ open class BaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_base)
     }
      */
+
+    private var doubleBackToExitPressedOnce = false
     private lateinit var mProgressDialog: Dialog
     private lateinit var tv_progress_text: FCTextView
 
@@ -63,6 +67,26 @@ open class BaseActivity : AppCompatActivity() {
     // Function to allow user to dismiss the progress dialog.
     fun hideProgressDialog() {
         mProgressDialog.dismiss()
+    }
+
+    fun doubleBackToExit() {
+
+        if (doubleBackToExitPressedOnce) {
+            // The default functionality of pressing back button once.
+            super.onBackPressed()
+            return
+        }
+
+        this.doubleBackToExitPressedOnce = true
+
+        Toast.makeText(
+            this,
+            resources.getString(R.string.click_back_again),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        @Suppress("DEPRECATION")
+        Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
     }
 
 }

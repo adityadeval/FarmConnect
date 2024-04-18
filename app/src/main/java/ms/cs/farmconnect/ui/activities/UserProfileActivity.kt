@@ -11,7 +11,9 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import ms.cs.farmconnect.R
@@ -21,6 +23,7 @@ import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.CustomRadioButton
 import ms.cs.farmconnect.utils.FCButton
+import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
 
@@ -33,6 +36,10 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     private lateinit var iv_user_photo : ImageView
     private lateinit var btn_submit : FCButton
     private lateinit var rb_male : CustomRadioButton
+    private lateinit var rb_female : CustomRadioButton
+
+    private lateinit var toolbar_user_profile_activity : Toolbar
+    private lateinit var tv_title : TextView
 
     // Creating and initializing mutable variable userDetails of type User class, to an instance of User class.
     private lateinit var mUserDetails: User
@@ -51,6 +58,9 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         iv_user_photo = findViewById(R.id.iv_user_photo)
         btn_submit = findViewById(R.id.btn_submit)
         rb_male = findViewById(R.id.rb_male)
+        rb_female = findViewById(R.id.rb_female)
+        toolbar_user_profile_activity = findViewById(R.id.toolbar_user_profile_activity)
+        tv_title = findViewById(R.id.tv_title)
 
         if(intent.hasExtra(Constants.EXTRA_USER_DETAILS)) {
 
@@ -69,15 +79,53 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             //userDetails = intent.getParcelableExtra(Constants.EXTRA_USER_DETAILS, User::class.java) ?: User()
         }
 
-        // Setting isEnabled to false will now freeze that EditText and the user would no longer be able to edit it.
-        et_first_name.isEnabled = false
+        // Set the existing values to the UI.
         et_first_name.setText(mUserDetails.firstName)
-
-        et_last_name.isEnabled = false
         et_last_name.setText(mUserDetails.lastName)
+        et_email.setText(mUserDetails.email)
 
         et_email.isEnabled = false
-        et_email.setText(mUserDetails.email)
+
+        if (mUserDetails.profileCompleted == 0) {
+            // Since profile isn;t yet complete, show the title as Please complete your profile.
+            tv_title.text = resources.getString(R.string.title_complete_profile)
+
+            // Setting isEnabled to false will now freeze that EditText and
+            // the user would no longer be able to edit it.
+            et_first_name.isEnabled = false
+            et_last_name.isEnabled = false
+
+        } else {
+
+            // Display the customized toolbar which has a back button, only when user has already
+            // completed his user profile.
+            setupActionBar()
+
+            // Since User's profile would have been completed at this point, show title as Edit profile.
+            tv_title.text = resources.getString(R.string.title_edit_profile)
+
+            // Load the image using the GlideLoader class with the use of Glide Library.
+            GlideLoader(this@UserProfileActivity).loadUserPicture(mUserDetails.image, iv_user_photo)
+
+            if (mUserDetails.mobile != 0L) {
+                et_mobile_number.setText(mUserDetails.mobile.toString())
+            }
+            if (mUserDetails.gender == Constants.MALE) {
+                rb_male.isChecked = true
+            } else {
+                rb_female.isChecked = true
+            }
+        }
+
+//        // Setting isEnabled to false will now freeze that EditText and the user would no longer be able to edit it.
+//        et_first_name.isEnabled = false
+//        et_first_name.setText(mUserDetails.firstName)
+//
+//        et_last_name.isEnabled = false
+//        et_last_name.setText(mUserDetails.lastName)
+//
+//        et_email.isEnabled = false
+//        et_email.setText(mUserDetails.email)
 
         iv_user_photo.setOnClickListener(this@UserProfileActivity)
         btn_submit.setOnClickListener(this@UserProfileActivity)
@@ -152,6 +200,18 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         // So, in this activity we only need to get mobile number and gender. Rest of the fields in this Activity are non-editable.
         val userHashMap = HashMap<String, Any>()
 
+        // Trim empty spaces and check if first name that the user entered actually differs from what
+        // we already have. If it does, only then add the new username to hashmap.
+        val firstName = et_first_name.text.toString().trim { it <= ' ' }
+        if (firstName != mUserDetails.firstName) {
+            userHashMap[Constants.FIRST_NAME] = firstName
+        }
+
+        val lastName = et_last_name.text.toString().trim { it <= ' ' }
+        if (lastName != mUserDetails.lastName) {
+            userHashMap[Constants.LAST_NAME] = lastName
+        }
+
         val mobileNumber = et_mobile_number.text.toString().trim { it <= ' ' }
 
         val gender = if (rb_male.isChecked) {
@@ -164,11 +224,13 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             userHashMap[Constants.IMAGE] = mUserProfileImageURL
         }
 
-        if (mobileNumber.isNotEmpty()) {
+        if (mobileNumber.isNotEmpty() && mobileNumber != mUserDetails.mobile.toString() ) {
             userHashMap[Constants.MOBILE] = mobileNumber.toLong()
         }
 
-        userHashMap[Constants.GENDER] = gender
+        if (gender.isNotEmpty() && gender != mUserDetails.gender) {
+            userHashMap[Constants.GENDER] = gender
+        }
 
         //showProgressDialog(resources.getString(R.string.please_wait))
         userHashMap[Constants.COMPLETE_PROFILE] = 1
@@ -192,7 +254,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         ).show()
 
         // Redirect to the Main Screen after profile completion.
-        startActivity(Intent(this@UserProfileActivity, MainActivity::class.java))
+        startActivity(Intent(this@UserProfileActivity, DashboardActivity::class.java))
         finish()
     }
 
@@ -284,6 +346,19 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     fun imageUploadSuccess(imageURL: String) {
         mUserProfileImageURL = imageURL
         updateUserProfileDetails()
+    }
+
+    private fun setupActionBar() {
+
+        setSupportActionBar(toolbar_user_profile_activity)
+
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_white_color_back_24dp)
+        }
+
+        toolbar_user_profile_activity.setNavigationOnClickListener { onBackPressed() }
     }
 
 }

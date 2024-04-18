@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.util.TextUtils
 import ms.cs.farmconnect.R
+import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
@@ -100,7 +101,8 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
 
                 R.id.btn_submit -> {
                     if (validateProductDetails()) {
-                        showCustomSnackBar("Product details are valid", false)
+                        //showCustomSnackBar("Product details are valid", false)
+                        uploadProductImage()
                     }
                 }
 
@@ -208,5 +210,21 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun uploadProductImage() {
 
+        showProgressDialog(resources.getString(R.string.please_wait))
+
+        FirestoreClass().uploadImageToCloudStorage(
+            this@AddProductActivity,
+            mSelectedImageFileUri,
+            Constants.PRODUCT_IMAGE
+        )
+    }
+
+    fun imageUploadSuccess(imageURL: String) {
+
+        hideProgressDialog()
+        showCustomSnackBar(
+            "Product image is uploaded successfully. Image URL: $imageURL", false)
+    }
 }

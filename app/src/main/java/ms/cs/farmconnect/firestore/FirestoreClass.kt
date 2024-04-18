@@ -14,6 +14,7 @@ import ms.cs.farmconnect.ui.activities.LoginActivity
 import ms.cs.farmconnect.ui.activities.RegisterActivity
 import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
+import ms.cs.farmconnect.ui.activities.AddProductActivity
 import ms.cs.farmconnect.ui.activities.SettingsActivity
 import ms.cs.farmconnect.utils.Constants
 
@@ -168,7 +169,7 @@ class FirestoreClass {
             }
     }
 
-    fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?) {
+    fun uploadImageToCloudStorage(activity: Activity, imageFileURI: Uri?, imageType: String) {
 
 
         // The FirebaseStorage.getInstance().reference gets you a Storage reference to the root path of your Firebase Storage bucket.
@@ -178,7 +179,7 @@ class FirestoreClass {
         val sRef: StorageReference = FirebaseStorage.getInstance().reference.child(
             // We create a name of the image file, that we upload into the Firebase storage.
             // For eg. User_Profile_Image1713243701.jpg
-            Constants.USER_PROFILE_IMAGE + System.currentTimeMillis() + "."
+            imageType + System.currentTimeMillis() + "."
                     + Constants.getFileExtension(
                 activity,
                 imageFileURI
@@ -211,6 +212,10 @@ class FirestoreClass {
                                 // This function will then store the url locally in a variable called mUserProfileImageURL inside its class.
                                 activity.imageUploadSuccess(uri.toString())
                             }
+
+                            is AddProductActivity -> {
+                                activity.imageUploadSuccess(uri.toString())
+                            }
                         }
                     }
             }
@@ -221,6 +226,10 @@ class FirestoreClass {
                 // Hide the progress dialog if there is any error. And print the error in log.
                 when (activity) {
                     is UserProfileActivity -> {
+                        activity.hideProgressDialog()
+                    }
+
+                    is AddProductActivity -> {
                         activity.hideProgressDialog()
                     }
                 }

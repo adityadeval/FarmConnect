@@ -1,17 +1,24 @@
 package ms.cs.farmconnect.ui.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
+import com.google.firebase.auth.FirebaseAuth
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.User
+import ms.cs.farmconnect.utils.Constants
+import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.FCTextViewBold
 import ms.cs.farmconnect.utils.GlideLoader
 
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : BaseActivity(), View.OnClickListener {
+
+    private lateinit var mUserDetails: User
 
     private lateinit var toolbar_settings_activity : Toolbar
     private lateinit var iv_user_photo : ImageView
@@ -19,6 +26,8 @@ class SettingsActivity : BaseActivity() {
     private lateinit var tv_gender : FCTextView
     private lateinit var tv_email : FCTextView
     private lateinit var tv_mobile_number : FCTextView
+    private lateinit var btn_logout : FCButton
+    private lateinit var tv_edit : FCTextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -29,7 +38,12 @@ class SettingsActivity : BaseActivity() {
         tv_gender = findViewById(R.id.tv_gender)
         tv_email = findViewById(R.id.tv_email)
         tv_mobile_number = findViewById(R.id.tv_mobile_number)
+        btn_logout = findViewById(R.id.btn_logout)
+        tv_edit = findViewById(R.id.tv_edit)
         setupActionBar()
+
+        btn_logout.setOnClickListener(this@SettingsActivity)
+        tv_edit.setOnClickListener(this@SettingsActivity)
     }
 
     // Create a back button in the toolbar of the Settings Activity.
@@ -66,6 +80,8 @@ class SettingsActivity : BaseActivity() {
 
     fun userDetailsSuccess(user: User) {
 
+        mUserDetails = user
+
         hideProgressDialog()
 
         GlideLoader(this@SettingsActivity).loadUserPicture(user.image, iv_user_photo)
@@ -82,6 +98,31 @@ class SettingsActivity : BaseActivity() {
         super.onResume()
 
         getUserDetails()
+    }
+
+    override fun onClick(v: View?) {
+        if (v != null) {
+            when (v.id) {
+                R.id.btn_logout -> {
+
+                    FirebaseAuth.getInstance().signOut()
+
+                    val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
+                    // NEW_TASK flag : This flag is used when you're starting a new activity outside the context of an existing activity.
+                    // CLEAR_TASK flag : This flag will remove any existing activities in the current task stack before starting the new activity.
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+
+                R.id.tv_edit -> {
+                    val intent = Intent(this@SettingsActivity, UserProfileActivity::class.java)
+                    intent.putExtra(Constants.EXTRA_USER_DETAILS, mUserDetails)
+                    startActivity(intent)
+                }
+
+            }
+        }
     }
 
 }

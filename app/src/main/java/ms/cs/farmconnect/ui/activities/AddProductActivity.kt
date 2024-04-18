@@ -4,7 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,8 +13,11 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.util.TextUtils
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.utils.Constants
+import ms.cs.farmconnect.utils.CustomEditText
+import ms.cs.farmconnect.utils.FCButton
 import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
 
@@ -23,6 +26,13 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
     private lateinit var toolbar_add_product_activity : Toolbar
     private lateinit var iv_add_update_product : ImageView
     private lateinit var iv_product_image : ImageView
+    private lateinit var et_product_title : CustomEditText
+    private lateinit var et_product_price : CustomEditText
+    private lateinit var et_product_description : CustomEditText
+    private lateinit var et_product_quantity : CustomEditText
+    private lateinit var btn_submit : FCButton
+
+    private var mSelectedImageFileUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +41,17 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
         toolbar_add_product_activity  = findViewById(R.id.toolbar_add_product_activity )
         iv_add_update_product = findViewById(R.id.iv_add_update_product)
         iv_product_image = findViewById(R.id.iv_product_image)
+        et_product_title = findViewById(R.id.et_product_title)
+        et_product_price = findViewById(R.id.et_product_price)
+        et_product_description = findViewById(R.id.et_product_description)
+        et_product_quantity = findViewById(R.id.et_product_quantity)
+        btn_submit = findViewById(R.id.btn_submit)
 
         setupActionBar()
 
         // Set on Click listener for the little add_image icon that appears just beside the product's image.
         iv_add_update_product.setOnClickListener(this)
+        btn_submit.setOnClickListener(this)
     }
 
     private fun setupActionBar() {
@@ -82,6 +98,11 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
                     }
                 }
 
+                R.id.btn_submit -> {
+                    if (validateProductDetails()) {
+                        showCustomSnackBar("Product details are valid", false)
+                    }
+                }
 
             }
         }
@@ -128,12 +149,12 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
                     // data parameter of onActivityResult will contain data returned by the popup screen for selecting image.
                     // data.data would be the uri of the locally stored image that the user selected.
                     // Storing this uri in SelectedImageFileUri
-                    val SelectedImageFileUri = data.data!!
+                    mSelectedImageFileUri = data.data!!
 
                     try {
                         // Load the product image in the ImageView.
                         GlideLoader(this@AddProductActivity).loadUserPicture(
-                            SelectedImageFileUri!!,
+                            mSelectedImageFileUri!!,
                             iv_product_image
                         )
                     } catch (e: IOException) {
@@ -146,5 +167,46 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
         }
 
     }
+
+    private fun validateProductDetails(): Boolean {
+        return when {
+
+            mSelectedImageFileUri == null -> {
+                showCustomSnackBar(resources.getString(R.string.err_msg_select_product_image), true)
+                false
+            }
+
+            TextUtils.isEmpty(et_product_title.text.toString().trim { it <= ' ' }) -> {
+                showCustomSnackBar(resources.getString(R.string.err_msg_enter_product_title), true)
+                false
+            }
+
+            TextUtils.isEmpty(et_product_price.text.toString().trim { it <= ' ' }) -> {
+                showCustomSnackBar(resources.getString(R.string.err_msg_enter_product_price), true)
+                false
+            }
+
+            TextUtils.isEmpty(et_product_description.text.toString().trim { it <= ' ' }) -> {
+                showCustomSnackBar(
+                    resources.getString(R.string.err_msg_enter_product_description),
+                    true
+                )
+                false
+            }
+
+            TextUtils.isEmpty(et_product_quantity.text.toString().trim { it <= ' ' }) -> {
+                showCustomSnackBar(
+                    resources.getString(R.string.err_msg_enter_product_quantity),
+                    true
+                )
+                false
+            }
+            else -> {
+                true
+            }
+
+        }
+    }
+
 
 }

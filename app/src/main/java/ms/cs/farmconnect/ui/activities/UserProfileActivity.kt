@@ -23,7 +23,6 @@ import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.CustomRadioButton
 import ms.cs.farmconnect.utils.FCButton
-import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.GlideLoader
 import java.io.IOException
 

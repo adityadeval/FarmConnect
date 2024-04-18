@@ -14,6 +14,7 @@ import ms.cs.farmconnect.ui.activities.LoginActivity
 import ms.cs.farmconnect.ui.activities.RegisterActivity
 import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
+import ms.cs.farmconnect.ui.activities.SettingsActivity
 import ms.cs.farmconnect.utils.Constants
 
 // This class will contain all operations performed in the Cloud Firestore.
@@ -104,8 +105,11 @@ class FirestoreClass {
 
                 when (activity) {
                     is LoginActivity -> {
-                        // Call a function of base activity for transferring the result to it.
                         activity.userLoggedInSuccess(user)
+                    }
+
+                    is SettingsActivity ->{
+                        activity.userDetailsSuccess(user)
                     }
                 }
 
@@ -114,6 +118,10 @@ class FirestoreClass {
                 // Hide the progress dialog if there is any error. And print the error in log.
                 when (activity) {
                     is LoginActivity -> {
+                        activity.hideProgressDialog()
+                    }
+
+                    is SettingsActivity -> {
                         activity.hideProgressDialog()
                     }
                 }

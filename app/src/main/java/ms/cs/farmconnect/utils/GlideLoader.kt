@@ -11,7 +11,7 @@ class GlideLoader(val context: Context) {
 
     // Below function takes two simple arguments :
     // Location of the image in our device's storage and imageView in which we want to display it.
-    fun loadUserPicture(imageURI: Uri, imageView: ImageView) {
+    fun loadUserPicture(imageURI: Any, imageView: ImageView) {
         try {
             // Load the user image in the ImageView.
             Glide

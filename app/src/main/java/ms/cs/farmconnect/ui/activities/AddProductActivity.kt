@@ -2,6 +2,7 @@ package ms.cs.farmconnect.ui.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.util.TextUtils
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.firestore.FirestoreClass
+import ms.cs.farmconnect.models.Product
 import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.CustomEditText
 import ms.cs.farmconnect.utils.FCButton
@@ -34,6 +36,7 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
     private lateinit var btn_submit : FCButton
 
     private var mSelectedImageFileUri: Uri? = null
+    private var mProductImageURL: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -221,10 +224,54 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
         )
     }
 
+    // Function to fetch all data of the Product, store them inside an instance of the
+    // Products class and then finally call a method of the FireStore class which creates a
+    // document for this product inside the collection called 'Products'.
+    private fun uploadProductDetails() {
+
+        // Get the logged in username from the SharedPreferences that we have stored at a time of login.
+        val username =
+            this.getSharedPreferences(Constants.FARMCONNECT_PREFERENCES,
+                Context.MODE_PRIVATE).getString(Constants.LOGGED_IN_USERNAME,
+                "")!!
+
+        // Here we get the text from editText and trim the space
+        val product = Product(
+            FirestoreClass().getCurrentUserID(),
+            username,
+            et_product_title.text.toString().trim { it <= ' ' },
+            et_product_price.text.toString().trim { it <= ' ' },
+            et_product_description.text.toString().trim { it <= ' ' },
+            et_product_quantity.text.toString().trim { it <= ' ' },
+            mProductImageURL
+        )
+
+        FirestoreClass().uploadProductDetails(this@AddProductActivity, product)
+    }
+
     fun imageUploadSuccess(imageURL: String) {
 
+        // Store the URL of the product image in mProductImageURL.
+        mProductImageURL = imageURL
+
+        // Below function is called to store all details of the product into the Firestore.
+        // NOte that its called inside this function (imageUploadSuccess) as this function would be called, if
+        // the product image was uploaded successfully into the Cloud storage.
+        // This flow is imp as we then get a URL for this image, which is a field of the product details that we
+        // store in a Firestore doc, along with other product details.
+        uploadProductDetails()
+    }
+
+    fun productUploadSuccess() {
+
         hideProgressDialog()
-        showCustomSnackBar(
-            "Product image is uploaded successfully. Image URL: $imageURL", false)
+
+        Toast.makeText(
+            this@AddProductActivity,
+            resources.getString(R.string.product_uploaded_success_message),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        finish()
     }
 }

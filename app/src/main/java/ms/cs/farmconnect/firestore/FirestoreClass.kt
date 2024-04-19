@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -17,6 +18,7 @@ import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.ui.activities.AddProductActivity
 import ms.cs.farmconnect.ui.activities.SettingsActivity
+import ms.cs.farmconnect.ui.fragments.ProductsFragment
 import ms.cs.farmconnect.utils.Constants
 
 // This class will contain all operations performed in the Cloud Firestore.
@@ -154,6 +156,44 @@ class FirestoreClass {
                     "Error while getting user details.",
                     e
                 )
+            }
+    }
+
+    fun getProductsList(fragment: Fragment) {
+        mFireStore.collection(Constants.PRODUCTS)
+            .whereEqualTo(Constants.USER_ID, getCurrentUserID())
+            .get() // Will get the documents snapshots.
+            // In below line document is actually a list of documents
+            .addOnSuccessListener { document ->
+
+                Log.e("Products List", document.documents.toString())
+
+                // Here we have created a new instance for Products ArrayList.
+                val productsList: ArrayList<Product> = ArrayList()
+
+                // A for loop as per the list of documents to convert them into Products ArrayList.
+                for (i in document.documents) {
+
+                    val product = i.toObject(Product::class.java)
+                    product!!.product_id = i.id
+
+                    productsList.add(product)
+                }
+
+                when (fragment) {
+                    is ProductsFragment -> {
+                        fragment.successProductsListFromFireStore(productsList)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                // Hide the progress dialog if there is any error based on the base class instance.
+                when (fragment) {
+                    is ProductsFragment -> {
+                        fragment.hideProgressDialog()
+                    }
+                }
+                Log.e("Get Product List", "Error while getting product list.", e)
             }
     }
 

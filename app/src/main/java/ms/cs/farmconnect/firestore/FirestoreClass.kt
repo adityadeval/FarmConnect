@@ -344,4 +344,30 @@ class FirestoreClass {
             }
     }
 
+
+    // This function is designed to delete a product with a certain productID from the Firestore DB.
+    // It would be called from the deleteProduct() method of the ProductsFragment, which in turn would be called,
+    // by the MyProductsListAdapter when a user clicks on the delete icon for any of the displayed products.
+    fun deleteProduct(fragment: ProductsFragment, productId: String) {
+
+        mFireStore.collection(Constants.PRODUCTS)
+            .document(productId)
+            .delete()
+            .addOnSuccessListener {
+
+                fragment.productDeleteSuccess()
+            }
+            .addOnFailureListener { e ->
+
+                // Hide the progress dialog if there is an error.
+                fragment.hideProgressDialog()
+
+                Log.e(
+                    fragment.requireActivity().javaClass.simpleName,
+                    "Error while deleting the product.",
+                    e
+                )
+            }
+    }
+
 }

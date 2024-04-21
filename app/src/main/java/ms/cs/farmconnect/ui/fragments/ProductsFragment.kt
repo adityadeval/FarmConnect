@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -138,6 +139,10 @@ class ProductsFragment : BaseFragment() {
         }
     }
 
+    // When this method is called :
+    // It calls FirestoreClass.getProductsList() --> It fetches all relevant products data from Firestore
+    // --> Then calls ProductsFragment.successProductsListFromFireStore() --> This binds the MyProductsListAdapter to
+    // the recycler view present inside the ProductsFragment --> The adapter then displays all the products
     private fun getProductListFromFireStore() {
         // Show the progress dialog.
         showProgressDialog(resources.getString(R.string.please_wait))
@@ -150,11 +155,56 @@ class ProductsFragment : BaseFragment() {
     // when the user clicks on the dustbin icon for any product present inside the Products fragment.
     fun deleteProduct(productID: String) {
 
+        showAlertDialogToDeleteProduct(productID)
+    }
+
+    fun productDeleteSuccess() {
+
+        // Hide the progress dialog
+        hideProgressDialog()
+
         Toast.makeText(
             requireActivity(),
-            "You can now delete the product. $productID",
+            resources.getString(R.string.product_delete_success_message),
             Toast.LENGTH_SHORT
         ).show()
+
+        // Below function will fetch the updated product data from Firestore and also display
+        // the products again inside the ProductsFragment. It's equivalent to doing a screen 'Refresh'
+        // once a product is deleted.
+        getProductListFromFireStore()
+    }
+
+    private fun showAlertDialogToDeleteProduct(productID: String) {
+
+        val builder = AlertDialog.Builder(requireActivity())
+        //set title for alert dialog
+        builder.setTitle(resources.getString(R.string.delete_dialog_title))
+        //set message for alert dialog
+        builder.setMessage(resources.getString(R.string.delete_dialog_message))
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+        //performing positive action
+        builder.setPositiveButton(resources.getString(R.string.yes)) { dialogInterface, _ ->
+
+            showProgressDialog(resources.getString(R.string.please_wait))
+
+            // Call the function of Firestore class.
+            FirestoreClass().deleteProduct(this@ProductsFragment, productID)
+
+            dialogInterface.dismiss()
+        }
+
+        //performing negative action
+        builder.setNegativeButton(resources.getString(R.string.no)) { dialogInterface, _ ->
+
+            dialogInterface.dismiss()
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Below line doesn't allow user to close the dialog. User can only click on Yes or No.
+        alertDialog.setCancelable(false)
+        alertDialog.show()
     }
 
 }

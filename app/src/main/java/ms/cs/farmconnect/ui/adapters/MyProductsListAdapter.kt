@@ -1,6 +1,7 @@
 package ms.cs.farmconnect.ui.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.Product
+import ms.cs.farmconnect.ui.activities.ProductDetailsActivity
 import ms.cs.farmconnect.ui.fragments.ProductsFragment
 import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.FCTextViewBold
@@ -54,6 +56,11 @@ open class MyProductsListAdapter(
             holder.tv_item_price.text = "$${model.price}"
             holder.ib_delete_product.setOnClickListener {
                 fragment.deleteProduct(model.product_id)
+            }
+
+            holder.itemView.setOnClickListener{
+                val intent = Intent(context, ProductDetailsActivity::class.java)
+                context.startActivity(intent)
             }
 
         }

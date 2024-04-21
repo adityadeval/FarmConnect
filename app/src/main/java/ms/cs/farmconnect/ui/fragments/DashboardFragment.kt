@@ -18,6 +18,7 @@ import ms.cs.farmconnect.databinding.FragmentDashboardBinding
 import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.Product
 import ms.cs.farmconnect.ui.activities.SettingsActivity
+import ms.cs.farmconnect.ui.adapters.DashboardItemsListAdapter
 
 class DashboardFragment : BaseFragment() {
 
@@ -85,26 +86,25 @@ class DashboardFragment : BaseFragment() {
 
         // Hide the progress dialog.
         hideProgressDialog()
-        for (i in dashboardItemsList) {
-            Log.i("Item Title", i.title)
-        }
-        /*
+
         if (dashboardItemsList.size > 0) {
 
             binding.rvDashboardItems.visibility = View.VISIBLE
             binding.tvNoDashboardItemsFound.visibility = View.GONE
 
+            // Second argument of GridLayoutManager is the span count.
+            // Span count determines the number of columns that would be present in the grid.
             binding.rvDashboardItems.layoutManager = GridLayoutManager(activity, 2)
             binding.rvDashboardItems.setHasFixedSize(true)
 
             val adapter = DashboardItemsListAdapter(requireActivity(), dashboardItemsList)
             binding.rvDashboardItems.adapter = adapter
+
         } else {
             binding.rvDashboardItems.visibility = View.GONE
             binding.tvNoDashboardItemsFound.visibility = View.VISIBLE
         }
 
-         */
     }
 
     private fun getDashboardItemsList() {

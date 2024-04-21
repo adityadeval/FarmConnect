@@ -2,6 +2,7 @@ package ms.cs.farmconnect.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -10,12 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import ms.cs.farmconnect.R
 //import androidx.lifecycle.ViewModelProvider
 import ms.cs.farmconnect.databinding.FragmentDashboardBinding
+import ms.cs.farmconnect.firestore.FirestoreClass
+import ms.cs.farmconnect.models.Product
 import ms.cs.farmconnect.ui.activities.SettingsActivity
 
-class DashboardFragment : Fragment() {
+class DashboardFragment : BaseFragment() {
 
     private var _binding: FragmentDashboardBinding? = null
 
@@ -39,14 +43,18 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textDashboard
-        textView.text = "This is dashboard Fragment"
 
 //        val textView: TextView = binding.textDashboard
 //        dashboardViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = "This is dashboard Fragment"
 //        }
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        getDashboardItemsList()
     }
 
     // Below function inflates the dashboard menu.
@@ -71,5 +79,38 @@ class DashboardFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun successDashboardItemsList(dashboardItemsList: ArrayList<Product>) {
+
+        // Hide the progress dialog.
+        hideProgressDialog()
+        for (i in dashboardItemsList) {
+            Log.i("Item Title", i.title)
+        }
+        /*
+        if (dashboardItemsList.size > 0) {
+
+            binding.rvDashboardItems.visibility = View.VISIBLE
+            binding.tvNoDashboardItemsFound.visibility = View.GONE
+
+            binding.rvDashboardItems.layoutManager = GridLayoutManager(activity, 2)
+            binding.rvDashboardItems.setHasFixedSize(true)
+
+            val adapter = DashboardItemsListAdapter(requireActivity(), dashboardItemsList)
+            binding.rvDashboardItems.adapter = adapter
+        } else {
+            binding.rvDashboardItems.visibility = View.GONE
+            binding.tvNoDashboardItemsFound.visibility = View.VISIBLE
+        }
+
+         */
+    }
+
+    private fun getDashboardItemsList() {
+        // Show the progress dialog.
+        showProgressDialog(resources.getString(R.string.please_wait))
+
+        FirestoreClass().getDashboardItemsList(this@DashboardFragment)
     }
 }

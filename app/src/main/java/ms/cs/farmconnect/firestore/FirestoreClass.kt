@@ -18,6 +18,7 @@ import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.ui.activities.AddProductActivity
 import ms.cs.farmconnect.ui.activities.SettingsActivity
+import ms.cs.farmconnect.ui.fragments.DashboardFragment
 import ms.cs.farmconnect.ui.fragments.ProductsFragment
 import ms.cs.farmconnect.utils.Constants
 
@@ -159,6 +160,8 @@ class FirestoreClass {
             }
     }
 
+    // This function is designed to fetch only the products listed for selling by the user who is logged in.
+    // These products would then be displayed inside the 'Products' fragment.
     fun getProductsList(fragment: Fragment) {
         mFireStore.collection(Constants.PRODUCTS)
             .whereEqualTo(Constants.USER_ID, getCurrentUserID())
@@ -301,6 +304,43 @@ class FirestoreClass {
                     exception.message,
                     exception
                 )
+            }
+    }
+
+    // This function is designed to fetch all products available inside the Firestore (listed for sale by all users).
+    // These products would then be displayed inside the Dashboard fragment.
+    fun getDashboardItemsList(fragment: DashboardFragment) {
+        // The collection name for PRODUCTS
+        mFireStore.collection(Constants.PRODUCTS)
+            .get() // Will get the documents snapshots.
+            .addOnSuccessListener { document ->
+
+                Log.e(fragment.javaClass.simpleName, document.documents.toString())
+
+                // Here we have created a new instance for Products ArrayList.
+                val productsList: ArrayList<Product> = ArrayList()
+
+                // A for loop as per the list of documents to convert them into Products ArrayList.
+                for (i in document.documents) {
+
+                    // Map all contents of the fetched document (for one product) to corresponding fields inside
+                    // an object of data class Product.
+                    val product = i.toObject(Product::class.java)!!
+                    // The documents for products stored on Firestore, won't be storing any values for key product_id.
+                    // So, in the locally stored object of Product data class, we map the key 'product_id' to a value
+                    // equal to the document id of that product's Firestore document.
+                    product.product_id = i.id
+                    productsList.add(product)
+                }
+
+                // Here fragment would be passed as an argument to this function, but it's always going to be an instance of
+                // the DashboardFragment. So the successDashboardItemsList() would have to be implemented inside the DashboardFragment.
+                fragment.successDashboardItemsList(productsList)
+            }
+            .addOnFailureListener { e ->
+                // Hide the progress dialog if there is any error which getting the dashboard items list.
+                fragment.hideProgressDialog()
+                Log.e(fragment.javaClass.simpleName, "Error while getting dashboard items list.", e)
             }
     }
 

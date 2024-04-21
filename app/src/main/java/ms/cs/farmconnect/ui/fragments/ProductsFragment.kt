@@ -11,12 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import ms.cs.farmconnect.R
 //import androidx.lifecycle.ViewModelProvider
 import ms.cs.farmconnect.databinding.FragmentProductsBinding
 import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.Product
 import ms.cs.farmconnect.ui.activities.AddProductActivity
+import ms.cs.farmconnect.ui.adapters.MyProductsListAdapter
 
 class ProductsFragment : BaseFragment() {
 
@@ -66,6 +69,12 @@ class ProductsFragment : BaseFragment() {
         return root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Continue with any initialization that requires the views, such as setting up adapters or listeners
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -99,8 +108,32 @@ class ProductsFragment : BaseFragment() {
         // Hide Progress dialog.
         hideProgressDialog()
 
-        for (i in productsList){
-            Log.i("Product Name", i.title)
+        // Here although in xml, we have field names as rv_my_product_items and tv_no_products_found,
+        // we need to use rvMyProductItems and tvNoProductsFound instead.
+        // In Kotlin, when using view binding with XML layouts, the generated binding class converts XML IDs into camel case properties.
+        // his conversion is based on standard naming conventions used in Kotlin and Java, where XML attributes and IDs typically use snake case (like rv_my_product_items),
+        // and these are transformed into camel case (like rvMyProductItems) for the properties in the binding class.
+
+        if (productsList.size > 0) {
+            binding.rvMyProductItems.visibility = View.VISIBLE
+            binding.tvNoProductsFound.visibility = View.GONE
+
+            // The LayoutManager assigned to the RecyclerView plays a crucial role in organizing the layout of the view holders
+            // produced by the adapter. It dictates not only the arrangement but also the behavior of scrolling and recycling of the views.
+            // Essentially, this line tells the RecyclerView to arrange its items in a linear vertical list (the default orientation for
+            // LinearLayoutManager is vertical).
+            binding.rvMyProductItems.layoutManager = LinearLayoutManager(activity)
+            // Below line notifies the RecyclerView that its size is not affected by the adapter contents.
+            // So the recycler view doesn't keep recalculating its size every time the content of its adapter changes.
+            binding.rvMyProductItems.setHasFixedSize(true)
+
+            // requireActivity() returns the activity associated with the fragment.
+            val adapterProducts =
+                MyProductsListAdapter(requireActivity(), productsList)
+            binding.rvMyProductItems.adapter = adapterProducts
+        } else {
+            binding.rvMyProductItems.visibility = View.GONE
+            binding.tvNoProductsFound.visibility = View.VISIBLE
         }
     }
 

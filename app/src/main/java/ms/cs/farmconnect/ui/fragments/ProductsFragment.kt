@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -129,7 +130,7 @@ class ProductsFragment : BaseFragment() {
 
             // requireActivity() returns the activity associated with the fragment.
             val adapterProducts =
-                MyProductsListAdapter(requireActivity(), productsList)
+                MyProductsListAdapter(requireActivity(), productsList, this)
             binding.rvMyProductItems.adapter = adapterProducts
         } else {
             binding.rvMyProductItems.visibility = View.GONE
@@ -143,6 +144,17 @@ class ProductsFragment : BaseFragment() {
 
         // Call the function of Firestore class.
         FirestoreClass().getProductsList(this@ProductsFragment)
+    }
+
+    // Below function would be called from the onBindViewHolder() method of the MyProductsListAdapter,
+    // when the user clicks on the dustbin icon for any product present inside the Products fragment.
+    fun deleteProduct(productID: String) {
+
+        Toast.makeText(
+            requireActivity(),
+            "You can now delete the product. $productID",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 }

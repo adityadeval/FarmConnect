@@ -4,17 +4,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.Product
+import ms.cs.farmconnect.ui.fragments.ProductsFragment
 import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.FCTextViewBold
 import ms.cs.farmconnect.utils.GlideLoader
 
 open class MyProductsListAdapter(
     private val context: Context,
-    private var list: ArrayList<Product>
+    private var list: ArrayList<Product>,
+    private val fragment: ProductsFragment
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // onCreateViewHolder is called when RecyclerView needs a new ViewHolder to represent an item.
@@ -49,6 +52,10 @@ open class MyProductsListAdapter(
 
             holder.tv_item_name.text = model.title
             holder.tv_item_price.text = "$${model.price}"
+            holder.ib_delete_product.setOnClickListener {
+                fragment.deleteProduct(model.product_id)
+            }
+
         }
     }
 
@@ -70,6 +77,7 @@ open class MyProductsListAdapter(
         var iv_item_image: ImageView = view.findViewById(R.id.iv_item_image)
         var tv_item_name: FCTextViewBold = view.findViewById(R.id.tv_item_name)
         var tv_item_price: FCTextView = view.findViewById(R.id.tv_item_price)
+        var ib_delete_product : ImageButton = view.findViewById(R.id.ib_delete_product)
     }
 
 }

@@ -17,8 +17,10 @@ import ms.cs.farmconnect.R
 import ms.cs.farmconnect.databinding.FragmentDashboardBinding
 import ms.cs.farmconnect.firestore.FirestoreClass
 import ms.cs.farmconnect.models.Product
+import ms.cs.farmconnect.ui.activities.ProductDetailsActivity
 import ms.cs.farmconnect.ui.activities.SettingsActivity
 import ms.cs.farmconnect.ui.adapters.DashboardItemsListAdapter
+import ms.cs.farmconnect.utils.Constants
 
 class DashboardFragment : BaseFragment() {
 
@@ -99,6 +101,16 @@ class DashboardFragment : BaseFragment() {
 
             val adapter = DashboardItemsListAdapter(requireActivity(), dashboardItemsList)
             binding.rvDashboardItems.adapter = adapter
+
+            adapter.setOnClickListener(object :
+                DashboardItemsListAdapter.custom_OnClickListener {
+                override fun custom_onClick(position: Int, product: Product) {
+
+                    val intent = Intent(context, ProductDetailsActivity::class.java)
+                    intent.putExtra(Constants.EXTRA_PRODUCT_ID, product.product_id)
+                    startActivity(intent)
+                }
+            })
 
         } else {
             binding.rvDashboardItems.visibility = View.GONE

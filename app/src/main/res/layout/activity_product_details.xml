@@ -59,12 +59,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/product_details_title_price_marginTop"
-                android:background="@color/dashboard_item_details_bg"
                 android:orientation="vertical"
                 android:padding="@dimen/product_details_title_price_padding"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/iv_product_detail_image">
+<!--                android:background="@color/dashboard_item_details_bg"-->
+
 
                 <ms.cs.farmconnect.utils.FCTextViewBold
                     android:id="@+id/tv_product_details_title"

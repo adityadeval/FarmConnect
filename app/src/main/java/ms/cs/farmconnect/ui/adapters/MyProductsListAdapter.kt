@@ -12,6 +12,7 @@ import ms.cs.farmconnect.R
 import ms.cs.farmconnect.models.Product
 import ms.cs.farmconnect.ui.activities.ProductDetailsActivity
 import ms.cs.farmconnect.ui.fragments.ProductsFragment
+import ms.cs.farmconnect.utils.Constants
 import ms.cs.farmconnect.utils.FCTextView
 import ms.cs.farmconnect.utils.FCTextViewBold
 import ms.cs.farmconnect.utils.GlideLoader
@@ -60,6 +61,9 @@ open class MyProductsListAdapter(
 
             holder.itemView.setOnClickListener{
                 val intent = Intent(context, ProductDetailsActivity::class.java)
+                // Pass the product_id through intent to the ProductDetailsActivity, so that
+                // this activity can then fetch that product's data from Firestore and display it.
+                intent.putExtra(Constants.EXTRA_PRODUCT_ID, model.product_id)
                 context.startActivity(intent)
             }
 

@@ -17,6 +17,7 @@ import ms.cs.farmconnect.ui.activities.RegisterActivity
 import ms.cs.farmconnect.ui.activities.UserProfileActivity
 import ms.cs.farmconnect.models.User
 import ms.cs.farmconnect.ui.activities.AddProductActivity
+import ms.cs.farmconnect.ui.activities.ProductDetailsActivity
 import ms.cs.farmconnect.ui.activities.SettingsActivity
 import ms.cs.farmconnect.ui.fragments.DashboardFragment
 import ms.cs.farmconnect.ui.fragments.ProductsFragment
@@ -344,6 +345,33 @@ class FirestoreClass {
             }
     }
 
+    fun getProductDetails(activity: ProductDetailsActivity, productId: String) {
+
+        // The collection name for PRODUCTS
+        mFireStore.collection(Constants.PRODUCTS)
+            .document(productId)
+            .get() // Will get the document snapshots.
+            .addOnSuccessListener { document ->
+
+                // Here we get the product details in the form of document.
+                Log.e(activity.javaClass.simpleName, document.toString())
+
+                // Convert the snapshot to the object of Product data model class.
+                val product = document.toObject(Product::class.java)!!
+                if(product != null) {
+                    activity.productDetailsSuccess(product)
+                }
+
+            }
+            .addOnFailureListener { e ->
+
+                // Hide the progress dialog if there is an error.
+                activity.hideProgressDialog()
+
+                Log.e(activity.javaClass.simpleName, "Error while getting the product details.", e)
+            }
+    }
+
 
     // This function is designed to delete a product with a certain productID from the Firestore DB.
     // It would be called from the deleteProduct() method of the ProductsFragment, which in turn would be called,
@@ -369,5 +397,7 @@ class FirestoreClass {
                 )
             }
     }
+
+
 
 }
